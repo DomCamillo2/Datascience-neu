@@ -7,7 +7,7 @@ Short pointer: [`llms.txt`](llms.txt) · Course slides: [`llm_corpus/INDEX.md`](
 |-------|--------|
 | Course | Data Science for Linguists, Uni Tübingen, SoSe 2026 (Johannes Dellert) |
 | Team | Dominik Soballa, Luca Bouché (joint work — no exclusive split) |
-| Repo | https://github.com/DomCamillo2/Data-Sci- |
+| Repo | https://github.com/DomCamillo2/Datascience-neu |
 | Track | **Language Use** (corpus linguistics) |
 | Proposal due | **31 August 2026** |
 | Default project deadline | **31 December 2026** (~90 h/person expected) |
@@ -31,7 +31,7 @@ For course/lecture questions (not the graded project): start at [`llm_corpus/IND
 
 ### What this project IS
 
-A **corpus-linguistics** study: *where* automatic POS/lemma annotation becomes unreliable in **literary** German and English (Kafka’s *Trial*), and whether those **loci** differ across languages.
+A **corpus-linguistics** study of *where* two automatic POS/lemma annotation systems disagree in **literary** German and English Kafka texts, and whether those **disagreement loci** differ between the two corpus versions.
 
 ### What it is NOT
 
@@ -57,7 +57,7 @@ Which **UPOS** categories show the strongest automatic-annotator disagreement (S
 - Fine-tuning / multi-LLM cook-offs
 - Treating SpaCy labels as ground truth (they are **annotator A**, not gold)
 
-SpaCy and the LLM are **instruments** that mark difficulty loci — not the research object.
+SpaCy and the LLM are **instruments** that reveal loci of inter-annotator disagreement — not the research object. Without human gold labels, their disagreement does not show which system is wrong.
 
 ---
 
@@ -68,7 +68,7 @@ SpaCy and the LLM are **instruments** that mark difficulty loci — not the rese
 3. **Sample lock:** 300 sentences / language, seed **42** (`data/processed/tokens_{de,en}_sample.csv`). Do not silently resample.
 4. **Never edit** `data/raw/` Kafka texts.
 5. **Batch runs** via `scripts/run_llm_annotate.py` (resumable per-sentence cache under `data/processed/llm_cache/{lang}/`). Prefer this over ad-hoc notebook loops for full annotation.
-6. **Analysis narrative:** lead with **per-UPOS loci** and DE vs EN profiles; overall agreement is secondary (supports H3 only).
+6. **Analysis narrative:** lead with **per-UPOS loci** and DE vs EN corpus-version profiles; overall agreement is secondary (supports H3 only). Do not present the DE/EN contrast as proof of a general language effect because the English text is a translation.
 7. **Reproducibility (Session 12):** pin requirements, seeds, model IDs, README, raw + transforms. Proposal fidelity is graded — don’t change the promised design quietly.
 8. **Append** new trials/fixes to `reports/CHANGELOG_RUNS.md` (do not erase history).
 
