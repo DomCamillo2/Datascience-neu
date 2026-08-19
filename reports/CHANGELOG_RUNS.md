@@ -153,3 +153,10 @@ Future LLMs must start at repo-root [`AGENTS.md`](../AGENTS.md) (full brief) and
 - Current repository: https://github.com/DomCamillo2/Datascience-neu
 - Documentation now describes **inter-annotator disagreement**, not annotation unreliability or model error without a human gold standard.
 - DE/EN contrasts are framed as differences between the German text and English translation corpus versions, not as general language effects.
+
+
+### Pipeline validation and analysis notebook — 2026-08-19
+- Fixed sentence bootstrap resampling: duplicated sampled sentences now contribute repeatedly, so the CI is a valid sentence-level bootstrap.
+- Added token-ID and JSON-object validation for LLM output; malformed or reordered labels now fail instead of being silently aligned by list position.
+- Added the --retry-failed flag to re-query cached failed LLM annotations.
+- Implemented notebook 03 for per-UPOS loci, confusion pairs, overall agreement, Cohen's kappa, and a permutation-based chance baseline.
