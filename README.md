@@ -1,96 +1,63 @@
-# Linguistic loci of annotation disagreement in Kafka DE/EN
+# Linguistic loci of annotation disagreement (Kafka DE/EN)
 
-A corpus-linguistics project on where automatic POS/lemma annotation becomes unreliable in literary German and English, and whether the disagreement profile differs across languages.
+**Team:** Dominik Soballa, Luca Bouché  
+**Course:** Data Science for Linguists (SoSe 2026)  
+**Track:** Language Use  
 
-## Project summary
+## What this project is
 
-This project uses Kafka’s German and English prose as a test case for annotation instability in real literary language. The focus is not on deciding which system is “better,” but on identifying the grammatical categories where annotation disagreement becomes systematic.
+A **corpus-linguistics** study of where two automatic POS/lemma annotation systems disagree in literary German and English Kafka texts, and whether those **disagreement loci** differ between the two corpus versions.
 
-We compare two automatic annotators on the same tokenized sentences:
-- SpaCy as the token-alignment baseline
-- a local Ollama LLM as the second annotation system
+Two automatic annotation systems are compared on the same tokenized material; the scientific interest is in **where disagreement concentrates**, not in a leaderboard. Without human gold labels, disagreement is not evidence that either system is wrong.
 
-The research question is:
+## What it is not
 
-Which UPOS categories show the strongest disagreement between automatic annotators in Kafka’s literary German and English, and does the disagreement profile differ between the two languages?
+A model bake-off or a “which tagger is better?” project.
 
-## Core hypotheses
+## Project docs
 
-- H1: disagreement is uneven across UPOS categories
-- H2: DE and EN disagreement profiles differ
-- H3: overall agreement is above chance but below ceiling
+| What | Where |
+|------|--------|
+| Course instructions | [`AGENTS.md`](AGENTS.md) |
+| Short pointer | [`llms.txt`](llms.txt) |
+| Topic lock | [`PLAN.md`](PLAN.md) |
+| Proposal draft | [`proposal/PROPOSAL_DRAFT.md`](proposal/PROPOSAL_DRAFT.md) |
+| Implementation plan | [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) |
+| Status / checklist | [`reports/PREP_STATUS.md`](reports/PREP_STATUS.md) |
+| Change log | [`reports/CHANGELOG_RUNS.md`](reports/CHANGELOG_RUNS.md) |
+| Course slides / markdown corpus | [`llm_corpus/INDEX.md`](llm_corpus/INDEX.md) |
 
-## What this project is not
+## Status
 
-- not a model leaderboard
-- not a “SpaCy vs ChatGPT” comparison
-- not a dependency or NER benchmark
-- not a fine-tuning project
+- [x] Raw Kafka texts  
+- [x] SpaCy samples (300 sentences/language)  
+- [x] Prep scripts + notebooks 01–04  
+- [x] Small second-annotator validation run  
+- [ ] Full second-annotator run (300 sentences/language)  
+- [ ] Loci analysis DE/EN  
+- [ ] Report + proposal submit  
 
-## Repository guide
+See [`reports/PREP_STATUS.md`](reports/PREP_STATUS.md).
 
-| Purpose | Location |
-|---|---|
-| Full project brief for future LLMs | [AGENTS.md](AGENTS.md) |
-| Short routing pointer | [llms.txt](llms.txt) |
-| Topic lock and RQ | [PLAN.md](PLAN.md) |
-| Execution roadmap | [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) |
-| Proposal draft | [proposal/PROPOSAL_DRAFT.md](proposal/PROPOSAL_DRAFT.md) |
-| Prep checklist | [reports/PREP_STATUS.md](reports/PREP_STATUS.md) |
-| Change log | [reports/CHANGELOG_RUNS.md](reports/CHANGELOG_RUNS.md) |
-| Course corpus / lecture archive | [llm_corpus/INDEX.md](llm_corpus/INDEX.md) |
-| Analysis notebooks | [notebooks](notebooks) |
-| Annotation scripts | [scripts](scripts) |
-| Source code | [src](src) |
+## Immediate next steps
 
-## Current status
+1. Freeze the data and validation pipeline for the seed-42 sample sentences.
+2. Run the full DE and EN comparison annotation on the fixed sample.
+3. Compute disagreement rates by UPOS and compare the German and English corpus-version profiles.
+4. Build the final notebook narrative around the linguistic loci of disagreement.
 
-- [x] Kafka DE/EN raw texts archived
-- [x] Fixed token samples for DE and EN
-- [x] Prep validation passes
-- [x] Ollama + llama3.2:3b setup
-- [x] Annotation pipeline and trial checks
-- [ ] Full 300+300 annotation run
-- [ ] Loci analysis and report
-- [ ] Final proposal hand-in
+## Interpretation note
 
-## Quick start
+The English text is a translation. Any DE/EN contrast is therefore described as a difference between these **corpus versions**, not as proof of a general language difference.
+
+## Setup
 
 ```bash
-cd project
-source .venv/bin/activate
+source .venv/bin/activate   # Python 3.11 via uv
 python scripts/check_prep.py
 python scripts/run_llm_annotate.py
 ```
 
-Make sure Ollama is running and the model `llama3.2:3b` is available.
-
-## Project structure
-
-```text
-project/
-├── AGENTS.md
-├── PLAN.md
-├── IMPLEMENTATION_PLAN.md
-├── README.md
-├── data/
-├── figures/
-├── llm_corpus/
-├── notebooks/
-├── proposal/
-├── reports/
-├── scripts/
-├── src/
-└── requirements.txt
-```
-
 ## GitHub
 
-https://github.com/DomCamillo2/Data-Sci-
-
-## Team
-
-- Dominik Soballa
-- Luca Bouché
-
-Course: Data Science for Linguists (SoSe 2026)
+https://github.com/DomCamillo2/Datascience-neu
