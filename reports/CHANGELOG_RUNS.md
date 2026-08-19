@@ -30,7 +30,7 @@ Hypotheses: H1 uneven loci · H2 DE≠EN profiles · H3 agreement ≫ chance, �
 | Sample | 300 sents / language, seed **42** |
 | Design rule | SpaCy tokenizes; LLM must **not** re-tokenize (1:1 `tok_id`) |
 | Hardware | Mac M4 Pro (~24 GB) — fine for local Ollama |
-| GitHub | https://github.com/DomCamillo2/Data-Sci- |
+| GitHub | https://github.com/DomCamillo2/Datascience-neu |
 
 Also present locally (not used for main runs): `gemma4:12b`.
 
@@ -147,3 +147,9 @@ When you change code/framing, add a row to **Bugs & fixes** or **Repo / tooling*
 ## Agent onboarding (2026-08-04)
 
 Future LLMs must start at repo-root [`AGENTS.md`](../AGENTS.md) (full brief) and [`llms.txt`](../llms.txt) (pointer). Cursor always-apply rule: `.cursor/rules/agents-brief.mdc`.
+
+
+### Repository relocation and wording alignment — 2026-08-19
+- Current repository: https://github.com/DomCamillo2/Datascience-neu
+- Documentation now describes **inter-annotator disagreement**, not annotation unreliability or model error without a human gold standard.
+- DE/EN contrasts are framed as differences between the German text and English translation corpus versions, not as general language effects.
