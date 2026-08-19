@@ -30,14 +30,18 @@ Tokens:
 
 def _extract_json_list(text: str) -> list[Any]:
     text = text.strip()
-    if text.startswith("```"):
-        text = re.sub(r"^```(?:json)?\s*", "", text)
-        text = re.sub(r"\s*```$", "", text)
+    fence = chr(96) * 3
+    if text.startswith(fence):
+        text = re.sub(rf"^{re.escape(fence)}(?:json)?\s*", "", text)
+        text = re.sub(rf"\s*{re.escape(fence)}$", "", text)
     start = text.find("[")
     end = text.rfind("]")
     if start < 0 or end < 0:
         raise ValueError("No JSON list found in model output")
-    return json.loads(text[start : end + 1])
+    items = json.loads(text[start : end + 1])
+    if not isinstance(items, list):
+        raise ValueError("Model output must be a JSON list")
+    return items
 
 
 def annotate_tokens(
@@ -46,7 +50,7 @@ def annotate_tokens(
     temperature: float = 0.0,
     timeout: int = 120,
 ) -> list[dict[str, Any]]:
-    """Return list of {tok_id, upos, lemma, upos_norm} aligned to input tokens."""
+    """Return validated, position-aligned annotations for the supplied token list."""
     payload_tokens = [{"tok_id": i, "token": t} for i, t in enumerate(tokens)]
     prompt = PROMPT_TEMPLATE.format(tokens_json=json.dumps(payload_tokens, ensure_ascii=False))
     resp = requests.post(
@@ -60,22 +64,34 @@ def annotate_tokens(
         timeout=timeout,
     )
     resp.raise_for_status()
-    raw = resp.json().get("response", "")
-    items = _extract_json_list(raw)
+    items = _extract_json_list(resp.json().get("response", ""))
     if len(items) != len(tokens):
         raise ValueError(f"Length mismatch: got {len(items)} labels for {len(tokens)} tokens")
 
     out: list[dict[str, Any]] = []
     for i, item in enumerate(items):
-        upos = str(item.get("upos", "X"))
+        if not isinstance(item, dict):
+            raise ValueError(f"Item {i} is not a JSON object")
+        try:
+            returned_id = int(item["tok_id"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError(f"Item {i} has no valid tok_id") from exc
+        if returned_id != i:
+            raise ValueError(
+                f"Token alignment mismatch at position {i}: model returned tok_id={returned_id}"
+            )
+
+        raw_upos = str(item.get("upos", "")).strip().upper()
+        if not raw_upos:
+            raise ValueError(f"Item {i} has no UPOS label")
         lemma = str(item.get("lemma", tokens[i]))
         out.append(
             {
                 "tok_id": i,
-                "upos": upos,
+                "upos": raw_upos,
                 "lemma": lemma,
-                "upos_norm": normalize_upos(upos),
-                "upos_valid": normalize_upos(upos) in UPOS_TAGS or normalize_upos(upos) == "OTHER",
+                "upos_norm": normalize_upos(raw_upos),
+                "upos_valid": raw_upos in UPOS_TAGS,
             }
         )
     return out
