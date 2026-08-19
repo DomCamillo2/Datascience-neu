@@ -1,41 +1,18 @@
-# Create / link GitHub remote
+# GitHub repository
 
-Local git is ready in this folder (`main`, 2 commits). `gh` is not installed on this machine yet.
+Current project repository:
 
-## Option A — GitHub website (no CLI)
+https://github.com/DomCamillo2/Datascience-neu
 
-1. Open https://github.com/new  
-2. Repository name suggestion: `grambank-side-harmony`  
-3. **Private** recommended until submission (or Public if you prefer)  
-4. Do **not** add README / .gitignore / license (repo already has commits)  
-5. Then run:
+## Clone locally
 
 ```bash
-cd /Users/domi/Documents/Uni/DataScience_Lingo/project
-git remote add origin git@github.com:YOUR_USER/grambank-side-harmony.git
-# or HTTPS:
-# git remote add origin https://github.com/YOUR_USER/grambank-side-harmony.git
-git push -u origin main
+git clone https://github.com/DomCamillo2/Datascience-neu.git
+cd Datascience-neu
 ```
 
-## Option B — GitHub CLI (after install)
+## Before submission
 
-```bash
-# Homebrew
-brew install gh
-
-# or download: https://cli.github.com/
-
-gh auth login
-cd /Users/domi/Documents/Uni/DataScience_Lingo/project
-gh repo create grambank-side-harmony --private --source=. --remote=origin --push
-```
-
-## Invite supervisor later
-
-```bash
-gh repo invite JohannesDellert --permission push
-# or add collaborator in GitHub Settings → Collaborators
-```
-
-(Use his actual GitHub username when known.)
+- Invite the instructor once their GitHub username is confirmed.
+- Keep the repository reproducible: raw-data provenance, fixed seed, pinned requirements, and documented runs.
+- Record substantive changes in [`CHANGELOG_RUNS.md`](CHANGELOG_RUNS.md).
