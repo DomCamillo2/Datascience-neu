@@ -1,18 +1,17 @@
-"""Agreement metrics vs SpaCy reference labels."""
+"""Metrics for agreement between two automatic annotators."""
 
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import cohen_kappa_score
 
 from .config import UPOS_TAGS
 
 
 def normalize_upos(label: str) -> str:
     lab = (label or "").strip().upper()
-    if lab in UPOS_TAGS:
-        return lab
-    return "OTHER"
+    return lab if lab in UPOS_TAGS else "OTHER"
 
 
 def normalize_lemma(lemma: str) -> str:
@@ -21,14 +20,23 @@ def normalize_lemma(lemma: str) -> str:
     return str(lemma).strip().lower()
 
 
-def upos_accuracy(ref: pd.Series, hyp: pd.Series) -> float:
-    ref_n = ref.map(normalize_upos)
-    hyp_n = hyp.map(normalize_upos)
-    return float((ref_n == hyp_n).mean())
+def upos_accuracy(first: pd.Series, second: pd.Series) -> float:
+    """Raw UPOS agreement; neither input is a gold-standard reference."""
+    first_n = first.map(normalize_upos)
+    second_n = second.map(normalize_upos)
+    return float((first_n == second_n).mean())
 
 
-def lemma_accuracy(ref: pd.Series, hyp: pd.Series) -> float:
-    return float((ref.map(normalize_lemma) == hyp.map(normalize_lemma)).mean())
+def lemma_accuracy(first: pd.Series, second: pd.Series) -> float:
+    """Raw lemma-string agreement; neither input is a gold-standard reference."""
+    return float((first.map(normalize_lemma) == second.map(normalize_lemma)).mean())
+
+
+def cohen_kappa(first: pd.Series, second: pd.Series) -> float:
+    """Chance-corrected UPOS agreement between two automatic annotators."""
+    return float(
+        cohen_kappa_score(first.map(normalize_upos), second.map(normalize_upos))
+    )
 
 
 def bootstrap_agreement(
@@ -37,14 +45,47 @@ def bootstrap_agreement(
     n_boot: int = 1000,
     seed: int = 42,
 ) -> tuple[float, float, float]:
-    """Bootstrap mean token accuracy by resampling sentence ids."""
-    rng = np.random.default_rng(seed)
+    """Observed token agreement and a sentence-resampled 95% bootstrap CI."""
     df = pd.DataFrame({"sent_id": sent_ids, "correct": correct.astype(bool)})
-    unique = df["sent_id"].unique()
-    stats = []
-    for _ in range(n_boot):
-        chosen = rng.choice(unique, size=len(unique), replace=True)
-        part = df[df["sent_id"].isin(chosen)]
-        stats.append(part["correct"].mean())
-    arr = np.asarray(stats, dtype=float)
-    return float(arr.mean()), float(np.quantile(arr, 0.025)), float(np.quantile(arr, 0.975))
+    if df.empty:
+        raise ValueError("Cannot bootstrap an empty set of annotations.")
+
+    groups = [
+        group["correct"].to_numpy(dtype=float)
+        for _, group in df.groupby("sent_id", sort=False)
+    ]
+    rng = np.random.default_rng(seed)
+    stats = np.empty(n_boot, dtype=float)
+    for i in range(n_boot):
+        chosen = rng.integers(0, len(groups), size=len(groups))
+        stats[i] = np.concatenate([groups[j] for j in chosen]).mean()
+
+    observed = float(df["correct"].mean())
+    return (
+        observed,
+        float(np.quantile(stats, 0.025)),
+        float(np.quantile(stats, 0.975)),
+    )
+
+
+def permutation_agreement_baseline(
+    first: pd.Series,
+    second: pd.Series,
+    n_perm: int = 1000,
+    seed: int = 42,
+) -> tuple[float, float, float]:
+    """Chance agreement distribution after independently shuffling one tag sequence."""
+    first_n = first.map(normalize_upos).to_numpy()
+    second_n = second.map(normalize_upos).to_numpy()
+    if len(first_n) != len(second_n) or len(first_n) == 0:
+        raise ValueError("Inputs must be non-empty and have equal length.")
+
+    rng = np.random.default_rng(seed)
+    stats = np.empty(n_perm, dtype=float)
+    for i in range(n_perm):
+        stats[i] = (first_n == rng.permutation(second_n)).mean()
+    return (
+        float(stats.mean()),
+        float(np.quantile(stats, 0.025)),
+        float(np.quantile(stats, 0.975)),
+    )
